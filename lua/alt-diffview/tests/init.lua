@@ -1,0 +1,1 @@
+require("alt-diffview.bootstrap")

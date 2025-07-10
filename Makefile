@@ -1,7 +1,7 @@
 .PHONY: all
 all: dev test
 
-TEST_PATH := $(if $(TEST_PATH),$(TEST_PATH),lua/diffview/tests/)
+TEST_PATH := $(if $(TEST_PATH),$(TEST_PATH),lua/alt-diffview/tests/)
 export TEST_PATH
 
 # Usage:

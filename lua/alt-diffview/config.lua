@@ -1,208 +1,50 @@
-# AltDiffview.nvim
+require("alt-diffview.bootstrap")
 
-A fork of diffview.nvim - Single tabpage interface for easily cycling through diffs
-for all modified files for any git rev.
-
-> [!NOTE]
-> This is a fork of the original [diffview.nvim](https://github.com/sindrets/diffview.nvim)
-> plugin. The original plugin appears to be unmaintained at the time of this fork.
-> **If the original diffview.nvim resumes active maintenance, we recommend using the
-> original instead of this fork.**
-
-![preview](https://user-images.githubusercontent.com/2786478/131269942-e34100dd-cbb9-48fe-af31-6e518ce06e9e.png)
-
-
-## Introduction
-
-AltDiffview.nvim is a fork of diffview.nvim that continues its development.
-Vim's diff mode is pretty good, but there is no convenient way to quickly bring
-up all modified files in a diffsplit. This plugin aims to provide a simple,
-unified, single tabpage interface that lets you easily review all changed files
-for any git rev.
-
-## Requirements
-
-- Git ≥ 2.31.0 (for Git support)
-- Mercurial ≥ 5.4.0 (for Mercurial support)
-- Neovim ≥ 0.7.0 (with LuaJIT)
-- [nvim-web-devicons](https://github.com/nvim-tree/nvim-web-devicons) (optional) For file icons
-
-## Installation
-
-Install the plugin with your package manager of choice.
-
-```vim
-" Plug
-Plug 'KEY60228/alt-diffview.nvim'
-```
-
-```lua
--- Packer
-use 'KEY60228/alt-diffview.nvim'
-
--- Lazy.nvim
-{
-  'KEY60228/alt-diffview.nvim',
-  dependencies = { 'nvim-tree/nvim-web-devicons' }
-}
-```
-
-## Merge Tool
-
-![merge tool showcase](https://user-images.githubusercontent.com/2786478/188286293-13bbf0ab-3595-425d-ba4a-12f514c17eb6.png)
-
-Opening a diff view during a merge or a rebase will list the conflicted files in
-their own section. When opening a conflicted file, it will open in a 3-way diff
-allowing you to resolve the merge conflicts with the context of the target
-branch's version, as well as the version from the branch which is being merged.
-
-The 3-way diff is only the default layout for merge conflicts. There are
-multiple variations on this layout, a 4-way diff layout, and a single window
-layout available.
-
-In addition to the normal `:h copy-diffs` mappings, there are default mappings
-provided for jumping between conflict markers, obtaining a hunk directly from
-any of the diff buffers, and accepting any one, all, or none of the versions of
-a file given by a conflict region.
-
-For more information on the merge tool, mappings, layouts and how to
-configure them, see:
-
-- `:h alt-diffview-merge-tool`
-- `:h alt-diffview-config-view.x.layout`
-
-## File History
-
-![file history showcase](https://user-images.githubusercontent.com/2786478/188331057-f9ec9a0d-8cda-4ff8-ac98-febcc7aa4010.png)
-
-The file history view allows you to list all the commits that affected a given
-set of paths, and view the changes made in a diff split. This is a porcelain
-interface for git-log, and supports a good number of its options. Things like:
-
-- Filtering commits by grepping commit messages and commit authors.
-- Tracing the line evolution of a given set of line ranges for multiple files.
-- Only listing changes for a specific commit range, branch, or tag.
-- Following file changes through renames.
-
-Get started by opening file history for:
-
-- The current branch: `:AltDiffviewFileHistory`
-- The current file: `:AltDiffviewFileHistory %`
-
-For more info, see `:h :AltDiffviewFileHistory`.
-
-## Usage
-
-### `:AltDiffviewOpen [git rev] [options] [ -- {paths...}]`
-
-Calling `:AltDiffviewOpen` with no args opens a new AltDiffview that compares against
-the current index. You can also provide any valid git rev to view only changes
-for that rev.
-
-Examples:
-
-- `:AltDiffviewOpen`
-- `:AltDiffviewOpen HEAD~2`
-- `:AltDiffviewOpen HEAD~4..HEAD~2`
-- `:AltDiffviewOpen d4a7b0d`
-- `:AltDiffviewOpen d4a7b0d^!`
-- `:AltDiffviewOpen d4a7b0d..519b30e`
-- `:AltDiffviewOpen origin/main...HEAD`
-
-You can also provide additional paths to narrow down what files are shown:
-
-- `:AltDiffviewOpen HEAD~2 -- lua/diffview plugin`
-
-For information about additional `[options]`, visit the
-[documentation](doc/alt-diffview.txt).
-
-Additional commands for convenience:
-
-- `:AltDiffviewClose`: Close the current diffview. You can also use `:tabclose`.
-- `:AltDiffviewToggleFiles`: Toggle the file panel.
-- `:AltDiffviewFocusFiles`: Bring focus to the file panel.
-- `:AltDiffviewRefresh`: Update stats and entries in the file list of the current
-  AltDiffview.
-
-With a AltDiffview open and the default key bindings, you can cycle through changed
-files with `<tab>` and `<s-tab>` (see configuration to change the key bindings).
-
-#### Staging
-
-You can stage individual hunks by editing any buffer that represents the index
-(after running `:AltDiffviewOpen` with no `[git-rev]` the entries under "Changes"
-will have the index buffer on the left side, and the entries under "Staged
-changes" will have it on the right side). Once you write to an index buffer the
-index will be updated.
-
-### `:[range]AltDiffviewFileHistory [paths] [options]`
-
-Opens a new file history view that lists all commits that affected the given
-paths. This is a porcelain interface for git-log. Both `[paths]` and
-`[options]` may be specified in any order, even interchangeably.
-
-If no `[paths]` are given, defaults to the top-level of the working tree. The
-top-level will be inferred from the current buffer when possible, otherwise the
-cwd is used. Multiple `[paths]` may be provided and git pathspec is supported.
-
-If `[range]` is given, the file history view will trace the line evolution of the
-given range in the current file (for more info, see the `-L` flag in the docs).
-
-Examples:
-
-- `:AltDiffviewFileHistory`
-- `:AltDiffviewFileHistory %`
-- `:AltDiffviewFileHistory path/to/some/file.txt`
-- `:AltDiffviewFileHistory path/to/some/directory`
-- `:AltDiffviewFileHistory include/this and/this :!but/not/this`
-- `:AltDiffviewFileHistory --range=origin..HEAD`
-- `:AltDiffviewFileHistory --range=feat/example-branch`
-- `:'<,'>AltDiffviewFileHistory`
-
-> [!IMPORTANT]
-> ### Familiarize Yourself With `:h diff-mode`
->
-> This plugin assumes you're familiar with all the features already provided by
-> nvim's builtin diff-mode. These features include:
->
-> - Jumping between hunks (`:h jumpto-diffs`).
-> - Applying the changes of a diff hunk from any of the diffed buffers
->   (`:h copy-diffs`).
-> - And more...
->
-> Read the help page for more info.
-
----
-
-<br>
-
-> [!NOTE]
-> Additionally check out [USAGE](USAGE.md) for examples of some more specific
-> use-cases.
-
-<br>
-
----
-
-## Configuration
-
-<p>
-<details>
-<summary style='cursor: pointer'><b>Example config with default values</b></summary>
-
-```lua
--- Lua
+---@diagnostic disable: deprecated
+local EventEmitter = require("alt-diffview.events").EventEmitter
 local actions = require("alt-diffview.actions")
+local lazy = require("alt-diffview.lazy")
 
-require("alt-diffview").setup({
-  diff_binaries = false,    -- Show diffs for binaries
-  enhanced_diff_hl = false, -- See |alt-diffview-config-enhanced_diff_hl|
-  git_cmd = { "git" },      -- The git executable followed by default args.
-  hg_cmd = { "hg" },        -- The hg executable followed by default args.
-  use_icons = true,         -- Requires nvim-web-devicons
-  show_help_hints = true,   -- Show hints for how to open the help panel
-  watch_index = true,       -- Update views and index buffers when the git index changes.
-  icons = {                 -- Only applies when use_icons is true.
+local Diff1 = lazy.access("alt-diffview.scene.layouts.diff_1", "Diff1") ---@type Diff1|LazyModule
+local Diff2 = lazy.access("alt-diffview.scene.layouts.diff_2", "Diff2") ---@type Diff2|LazyModule
+local Diff2Hor = lazy.access("alt-diffview.scene.layouts.diff_2_hor", "Diff2Hor") ---@type Diff2Hor|LazyModule
+local Diff2Ver = lazy.access("alt-diffview.scene.layouts.diff_2_ver", "Diff2Ver") ---@type Diff2Ver|LazyModule
+local Diff3 = lazy.access("alt-diffview.scene.layouts.diff_3", "Diff3") ---@type Diff3|LazyModule
+local Diff3Hor = lazy.access("alt-diffview.scene.layouts.diff_3_hor", "Diff3Hor") ---@type Diff3Hor|LazyModule
+local Diff3Mixed = lazy.access("alt-diffview.scene.layouts.diff_3_mixed", "Diff3Mixed") ---@type Diff3Mixed|LazyModule
+local Diff3Ver = lazy.access("alt-diffview.scene.layouts.diff_3_ver", "Diff3Ver") ---@type Diff3Hor|LazyModule
+local Diff4 = lazy.access("alt-diffview.scene.layouts.diff_4", "Diff4") ---@type Diff4|LazyModule
+local Diff4Mixed = lazy.access("alt-diffview.scene.layouts.diff_4_mixed", "Diff4Mixed") ---@type Diff4Mixed|LazyModule
+local utils = lazy.require("alt-diffview.utils") ---@module "alt-diffview.utils"
+
+local M = {}
+
+local setup_done = false
+
+---@deprecated
+function M.diffview_callback(cb_name)
+  if cb_name == "select" then
+    -- Reroute deprecated action
+    return actions.select_entry
+  end
+  return actions[cb_name]
+end
+
+---@class ConfigLogOptions
+---@field single_file LogOptions
+---@field multi_file LogOptions
+
+-- stylua: ignore start
+---@class AltDiffviewConfig
+M.defaults = {
+  diff_binaries = false,
+  enhanced_diff_hl = false,
+  git_cmd = { "git" },
+  hg_cmd = { "hg" },
+  use_icons = true,
+  show_help_hints = true,
+  watch_index = true,
+  icons = {
     folder_closed = "",
     folder_open = "",
   },
@@ -212,76 +54,69 @@ require("alt-diffview").setup({
     done = "✓",
   },
   view = {
-    -- Configure the layout and behavior of different types of views.
-    -- Available layouts:
-    --  'diff1_plain'
-    --    |'diff2_horizontal'
-    --    |'diff2_vertical'
-    --    |'diff3_horizontal'
-    --    |'diff3_vertical'
-    --    |'diff3_mixed'
-    --    |'diff4_mixed'
-    -- For more info, see |alt-diffview-config-view.x.layout|.
     default = {
-      -- Config for changed files, and staged files in diff views.
       layout = "diff2_horizontal",
-      disable_diagnostics = false,  -- Temporarily disable diagnostics for diff buffers while in the view.
-      winbar_info = false,          -- See |alt-diffview-config-view.x.winbar_info|
+      disable_diagnostics = false,
+      winbar_info = false,
     },
     merge_tool = {
-      -- Config for conflicted files in diff views during a merge or rebase.
       layout = "diff3_horizontal",
-      disable_diagnostics = true,   -- Temporarily disable diagnostics for diff buffers while in the view.
-      winbar_info = true,           -- See |alt-diffview-config-view.x.winbar_info|
+      disable_diagnostics = true,
+      winbar_info = true,
     },
     file_history = {
-      -- Config for changed files in file history views.
       layout = "diff2_horizontal",
-      disable_diagnostics = false,  -- Temporarily disable diagnostics for diff buffers while in the view.
-      winbar_info = false,          -- See |alt-diffview-config-view.x.winbar_info|
+      disable_diagnostics = false,
+      winbar_info = false,
     },
   },
   file_panel = {
-    listing_style = "tree",             -- One of 'list' or 'tree'
-    tree_options = {                    -- Only applies when listing_style is 'tree'
-      flatten_dirs = true,              -- Flatten dirs that only contain one single dir
-      folder_statuses = "only_folded",  -- One of 'never', 'only_folded' or 'always'.
+    listing_style = "tree",
+    tree_options = {
+      flatten_dirs = true,
+      folder_statuses = "only_folded"
     },
-    win_config = {                      -- See |alt-diffview-config-win_config|
+    win_config = {
       position = "left",
       width = 35,
-      win_opts = {},
+      win_opts = {}
     },
   },
   file_history_panel = {
-    log_options = {   -- See |alt-diffview-config-log_options|
+    log_options = {
+      ---@type ConfigLogOptions
       git = {
         single_file = {
-          diff_merges = "combined",
+          diff_merges = "first-parent",
+          follow = true,
         },
         multi_file = {
           diff_merges = "first-parent",
         },
       },
+      ---@type ConfigLogOptions
       hg = {
         single_file = {},
         multi_file = {},
       },
     },
-    win_config = {    -- See |alt-diffview-config-win_config|
+    win_config = {
       position = "bottom",
       height = 16,
-      win_opts = {},
+      win_opts = {}
     },
   },
   commit_log_panel = {
-    win_config = {},  -- See |alt-diffview-config-win_config|
+    win_config = {
+      win_opts = {}
+    },
   },
-  default_args = {    -- Default args prepended to the arg-list for the listed commands
+  default_args = {
     AltDiffviewOpen = {},
     AltDiffviewFileHistory = {},
   },
-  hooks = {},         -- See |alt-diffview-config-hooks|
+  hooks = {},
+  -- Tabularize formatting pattern: `\v(\"[^"]{-}\",\ze(\s*)actions)|actions\.\w+(\(.{-}\))?,?|\{\ desc\ \=`
   keymaps = {
     disable_defaults = false, -- Disable the default keymaps
     view = {
@@ -309,6 +144,7 @@ require("alt-diffview").setup({
       { "n", "<leader>cB",  actions.conflict_choose_all("base"),    { desc = "Choose the BASE version of a conflict for the whole file" } },
       { "n", "<leader>cA",  actions.conflict_choose_all("all"),     { desc = "Choose all the versions of a conflict for the whole file" } },
       { "n", "dX",          actions.conflict_choose_all("none"),    { desc = "Delete the conflict region for the whole file" } },
+      unpack(actions.compat.fold_cmds),
     },
     diff1 = {
       -- Mappings in single window diff layouts
@@ -420,129 +256,411 @@ require("alt-diffview").setup({
       { "n", "<esc>", actions.close,  { desc = "Close help menu" } },
     },
   },
-})
-```
-
-</details>
-</p>
-
-### Hooks
-
-The `hooks` table allows you to define callbacks for various events emitted from
-AltDiffview. The available hooks are documented in detail in
-`:h alt-diffview-config-hooks`. The hook events are also available as User
-autocommands. See `:h alt-diffview-user-autocmds` for more details.
-
-Examples:
-
-```lua
-hooks = {
-  diff_buf_read = function(bufnr)
-    -- Change local options in diff buffers
-    vim.opt_local.wrap = false
-    vim.opt_local.list = false
-    vim.opt_local.colorcolumn = { 80 }
-  end,
-  view_opened = function(view)
-    print(
-      ("A new %s was opened on tab page %d!")
-      :format(view.class:name(), view.tabpage)
-    )
-  end,
 }
-```
+-- stylua: ignore end
 
-### Keymaps
+---@type EventEmitter
+M.user_emitter = EventEmitter()
+M._config = M.defaults
 
-The keymaps config is structured as a table with sub-tables for various
-different contexts where mappings can be declared. In these sub-tables
-key-value pairs are treated as the `{lhs}` and `{rhs}` of a normal mode
-mapping. These mappings all use the `:map-arguments` `silent`, `nowait`, and
-`noremap`. The implementation uses `vim.keymap.set()`, so the `{rhs}` can be
-either a vim command in the form of a string, or it can be a lua function:
+---@class GitLogOptions
+---@field follow boolean
+---@field first_parent boolean
+---@field show_pulls boolean
+---@field reflog boolean
+---@field walk_reflogs boolean
+---@field all boolean
+---@field merges boolean
+---@field no_merges boolean
+---@field reverse boolean
+---@field cherry_pick boolean
+---@field left_only boolean
+---@field right_only boolean
+---@field max_count integer
+---@field L string[]
+---@field author string
+---@field grep string
+---@field G string
+---@field S string
+---@field diff_merges string
+---@field rev_range string
+---@field base string
+---@field path_args string[]
+---@field after string
+---@field before string
 
-```lua
-  view = {
-    -- Vim command:
-    ["a"] = "<Cmd>echom 'foo'<CR>",
-    -- Lua function:
-    ["b"] = function() print("bar") end,
-  }
-```
+---@class HgLogOptions
+---@field follow string
+---@field limit integer
+---@field user string
+---@field no_merges boolean
+---@field rev string
+---@field keyword string
+---@field branch string
+---@field bookmark string
+---@field include string
+---@field exclude string
+---@field path_args string[]
 
-For more control (i.e. mappings for other modes), you can also define index
-values as list-like tables containing the arguments for `vim.keymap.set()`.
-This way you can also change all the `:map-arguments` with the only exception
-being the `buffer` field, as this will be overridden with the target buffer
-number:
+---@alias LogOptions GitLogOptions|HgLogOptions
 
-```lua
-view = {
-  -- Normal and visual mode mapping to vim command:
-  { { "n", "v" }, "<leader>a", "<Cmd>echom 'foo'<CR>", { silent = true } },
-  -- Visual mode mapping to lua function:
-  { "v", "<leader>b", function() print("bar") end, { nowait = true } },
+M.log_option_defaults = {
+  ---@type GitLogOptions
+  git = {
+    follow = false,
+    first_parent = false,
+    show_pulls = false,
+    reflog = false,
+    walk_reflogs = false,
+    all = false,
+    merges = false,
+    no_merges = false,
+    reverse = false,
+    cherry_pick = false,
+    left_only = false,
+    right_only = false,
+    rev_range = nil,
+    base = nil,
+    max_count = 256,
+    L = {},
+    diff_merges = nil,
+    author = nil,
+    grep = nil,
+    G = nil,
+    S = nil,
+    path_args = {},
+  },
+  ---@type HgLogOptions
+  hg = {
+    limit = 256,
+    user = nil,
+    no_merges = false,
+    rev = nil,
+    keyword = nil,
+    include = nil,
+    exclude = nil,
+  },
 }
-```
 
-To disable any single mapping without disabling them all, set its `{rhs}` to
-`false`:
+---@return AltDiffviewConfig
+function M.get_config()
+  if not setup_done then
+    M.setup()
+  end
 
-```lua
-  view = {
-    -- Disable the default normal mode mapping for `<tab>`:
-    ["<tab>"] = false,
-    -- Disable the default visual mode mapping for `gf`:
-    { "x", "gf", false },
-  }
-```
+  return M._config
+end
 
-Most of the mapped file panel actions also work from the view if they are added
-to the view maps (and vice versa). The exception is for actions that only
-really make sense specifically in the file panel, such as `next_entry`,
-`prev_entry`. Actions such as `toggle_stage_entry` and `restore_entry` work
-just fine from the view. When invoked from the view, these will target the file
-currently open in the view rather than the file under the cursor in the file
-panel.
+---@param single_file boolean
+---@param t GitLogOptions|HgLogOptions
+---@param vcs "git"|"hg"
+---@return GitLogOptions|HgLogOptions
+function M.get_log_options(single_file, t, vcs)
+  local log_options
 
-**For more details on how to set mappings for other modes, actions, and more see:**
-- `:h alt-diffview-config-keymaps`
-- `:h alt-diffview-actions`
+  if single_file then
+    log_options =  M._config.file_history_panel.log_options[vcs].single_file
+  else
+    log_options = M._config.file_history_panel.log_options[vcs].multi_file
+  end
 
-## Restoring Files
+  if t then
+    log_options = vim.tbl_extend("force", log_options, t)
 
-If the right side of the diff is showing the local state of a file, you can
-restore the file to the state from the left side of the diff (key binding `X`
-from the file panel by default). The current state of the file is stored in the
-git object database, and a command is echoed that shows how to undo the change.
+    for k, _ in pairs(log_options) do
+      if t[k] == "" then
+        log_options[k] = nil
+      end
+    end
+  end
 
-## Tips and FAQ
+  return log_options
+end
 
-- **Hide untracked files:**
-  - `AltDiffviewOpen -uno`
-- **Exclude certain paths:**
-  - `AltDiffviewOpen -- :!exclude/this :!and/this`
-- **Run as if git was started in a specific directory:**
-  - `AltDiffviewOpen -C/foo/bar/baz`
-- **Diff the index against a git rev:**
-  - `AltDiffviewOpen HEAD~2 --cached`
-  - Defaults to `HEAD` if no rev is given.
-- **Q: How do I get the diagonal lines in place of deleted lines in
-  diff-mode?**
-  - A: Change your `:h 'fillchars'`:
-    - (vimscript): `set fillchars+=diff:╱`
-    - (Lua): `vim.opt.fillchars:append { diff = "╱" }`
-  - Note: whether or not the diagonal lines will line up nicely will depend on
-    your terminal emulator. The terminal used in the screenshots is Kitty.
-- **Q: How do I jump between hunks in the diff?**
-  - A: Use `[c` and `]c`
-  - `:h jumpto-diffs`
+---@alias LayoutName "diff1_plain"
+---       | "diff2_horizontal"
+---       | "diff2_vertical"
+---       | "diff3_horizontal"
+---       | "diff3_vertical"
+---       | "diff3_mixed"
+---       | "diff4_mixed"
 
-## Credits
+local layout_map = {
+  diff1_plain = Diff1,
+  diff2_horizontal = Diff2Hor,
+  diff2_vertical = Diff2Ver,
+  diff3_horizontal = Diff3Hor,
+  diff3_vertical = Diff3Ver,
+  diff3_mixed = Diff3Mixed,
+  diff4_mixed = Diff4Mixed,
+}
 
-This plugin is a fork of the original [diffview.nvim](https://github.com/sindrets/diffview.nvim) by Sindre T. Strøm.
-All credit for the original implementation goes to the original author and contributors.
+---@param layout_name LayoutName
+---@return Layout
+function M.name_to_layout(layout_name)
+  assert(layout_map[layout_name], "Invalid layout name: " .. layout_name)
 
-This fork (alt-diffview.nvim) is maintained by Kenta Yamaguchi to ensure continued development while the original appears to be unmaintained.
+  return layout_map[layout_name].__get()
+end
 
-<!-- vim: set tw=80 -->
+---@param layout Layout
+---@return table?
+function M.get_layout_keymaps(layout)
+  if layout:instanceof(Diff1.__get()) then
+    return M._config.keymaps.diff1
+  elseif layout:instanceof(Diff2.__get()) then
+    return M._config.keymaps.diff2
+  elseif layout:instanceof(Diff3.__get()) then
+    return M._config.keymaps.diff3
+  elseif layout:instanceof(Diff4.__get()) then
+    return M._config.keymaps.diff4
+  end
+end
+
+function M.find_option_keymap(t)
+  for _, mapping in ipairs(t) do
+    if mapping[3] and mapping[3] == actions.options then
+      return mapping
+    end
+  end
+end
+
+function M.find_help_keymap(t)
+  for _, mapping in ipairs(t) do
+    if type(mapping[4]) == "table" and mapping[4].desc == "Open the help panel" then
+      return mapping
+    end
+  end
+end
+
+---@param values vector
+---@param no_quote? boolean
+---@return string
+local function fmt_enum(values, no_quote)
+  return table.concat(vim.tbl_map(function(v)
+    return (not no_quote and type(v) == "string") and ("'" .. v .. "'") or v
+  end, values), "|")
+end
+
+---@param ... table
+---@return table
+function M.extend_keymaps(...)
+  local argc = select("#", ...)
+  local argv = { ... }
+  local contexts = {}
+
+  for i = 1, argc do
+    local cur = argv[i]
+    if type(cur) == "table" then
+      contexts[#contexts + 1] = { subject = cur, expanded = {} }
+    end
+  end
+
+  for _, ctx in ipairs(contexts) do
+    -- Expand the normal mode maps
+    for lhs, rhs in pairs(ctx.subject) do
+      if type(lhs) == "string" then
+        ctx.expanded["n " .. lhs] = {
+          "n",
+          lhs,
+          rhs,
+          { silent = true, nowait = true },
+        }
+      end
+    end
+
+    for _, map in ipairs(ctx.subject) do
+      for _, mode in ipairs(type(map[1]) == "table" and map[1] or { map[1] }) do
+        ctx.expanded[mode .. " " .. map[2]] = utils.vec_join(
+          mode,
+          map[2],
+          utils.vec_slice(map, 3)
+        )
+      end
+    end
+  end
+
+  local merged = vim.tbl_extend("force", unpack(
+    vim.tbl_map(function(v)
+      return v.expanded
+    end, contexts)
+  ))
+
+  return vim.tbl_values(merged)
+end
+
+function M.setup(user_config)
+  user_config = user_config or {}
+
+  M._config = vim.tbl_deep_extend(
+    "force",
+    utils.tbl_deep_clone(M.defaults),
+    user_config
+  )
+  ---@type EventEmitter
+  M.user_emitter = EventEmitter()
+
+  --#region DEPRECATION NOTICES
+
+  if type(M._config.file_panel.use_icons) ~= "nil" then
+    utils.warn("'file_panel.use_icons' has been deprecated. See ':h alt-diffview.changelog-64'.")
+  end
+
+  -- Move old panel preoperties to win_config
+  local old_win_config_spec = { "position", "width", "height" }
+  for _, panel_name in ipairs({ "file_panel", "file_history_panel" }) do
+    local panel_config = M._config[panel_name]
+      ---@cast panel_config table
+    local notified = false
+
+    for _, option in ipairs(old_win_config_spec) do
+      if panel_config[option] ~= nil then
+        if not notified then
+          utils.warn(
+            ("'%s.{%s}' has been deprecated. See ':h alt-diffview.changelog-136'.")
+            :format(panel_name, fmt_enum(old_win_config_spec, true))
+          )
+          notified = true
+        end
+        panel_config.win_config[option] = panel_config[option]
+        panel_config[option] = nil
+      end
+    end
+  end
+
+  -- Move old keymaps
+  if user_config.key_bindings then
+    M._config.keymaps = vim.tbl_deep_extend("force", M._config.keymaps, user_config.key_bindings)
+    user_config.keymaps = user_config.key_bindings
+    M._config.key_bindings = nil
+  end
+
+  local user_log_options = utils.tbl_access(user_config, "file_history_panel.log_options")
+  if user_log_options then
+    local top_options = {
+      "single_file",
+      "multi_file",
+    }
+    for _, name in ipairs(top_options) do
+      if user_log_options[name] ~= nil then
+        utils.warn("Global config of 'file_panel.log_options' has been deprecated. See ':h alt-diffview.changelog-271'.")
+      end
+      break
+    end
+
+    local option_names = {
+      "max_count",
+      "follow",
+      "all",
+      "merges",
+      "no_merges",
+      "reverse",
+    }
+    for _, name in ipairs(option_names) do
+      if user_log_options[name] ~= nil then
+        utils.warn(
+          ("'file_history_panel.log_options.{%s}' has been deprecated. See ':h alt-diffview.changelog-151'.")
+          :format(fmt_enum(option_names, true))
+        )
+        break
+      end
+    end
+  end
+
+  --#endregion
+
+  if #M._config.git_cmd == 0 then
+    M._config.git_cmd = M.defaults.git_cmd
+  end
+
+  do
+    -- Validate layouts
+    local view = M._config.view
+    local standard_layouts = { "diff2_horizontal", "diff2_vertical", -1 }
+    local merge_layuots = {
+      "diff1_plain",
+      "diff3_horizontal",
+      "diff3_vertical",
+      "diff3_mixed",
+      "diff4_mixed",
+      -1
+    }
+    local valid_layouts = {
+      default = standard_layouts,
+      merge_tool = merge_layuots,
+      file_history = standard_layouts,
+    }
+
+    for _, kind in ipairs(vim.tbl_keys(valid_layouts)) do
+      if not vim.tbl_contains(valid_layouts[kind], view[kind].layout) then
+        utils.err(("Invalid layout name '%s' for 'view.%s'! Must be one of (%s)."):format(
+          view[kind].layout,
+          kind,
+          fmt_enum(valid_layouts[kind])
+        ))
+        view[kind].layout = M.defaults.view[kind].layout
+      end
+    end
+  end
+
+  for _, name in ipairs({ "single_file", "multi_file" }) do
+    for _, vcs in ipairs({ "git", "hg" }) do
+      local t = M._config.file_history_panel.log_options[vcs]
+      t[name] = vim.tbl_extend(
+        "force",
+        M.log_option_defaults[vcs],
+        t[name]
+      )
+      for k, _ in pairs(t[name]) do
+        if t[name][k] == "" then
+          t[name][k] = nil
+        end
+      end
+    end
+  end
+
+  for event, callback in pairs(M._config.hooks) do
+    if type(callback) == "function" then
+      M.user_emitter:on(event, function (_, ...)
+        callback(...)
+      end)
+    end
+  end
+
+  if M._config.keymaps.disable_defaults then
+    for name, _ in pairs(M._config.keymaps) do
+      if name ~= "disable_defaults" then
+        M._config.keymaps[name] = utils.tbl_access(user_config, { "keymaps", name }) or {}
+      end
+    end
+  else
+    M._config.keymaps = utils.tbl_clone(M.defaults.keymaps)
+  end
+
+  -- Merge default and user keymaps
+  for name, keymap in pairs(M._config.keymaps) do
+    if type(name) == "string" and type(keymap) == "table" then
+      M._config.keymaps[name] = M.extend_keymaps(
+        keymap,
+        utils.tbl_access(user_config, { "keymaps", name }) or {}
+      )
+    end
+  end
+
+  -- Disable keymaps set to `false`
+  for name, keymaps in pairs(M._config.keymaps) do
+    if type(name) == "string" and type(keymaps) == "table" then
+      for i = #keymaps, 1, -1 do
+        local v = keymaps[i]
+        if type(v) == "table" and not v[3] then
+          table.remove(keymaps, i)
+        end
+      end
+    end
+  end
+
+  setup_done = true
+end
+
+M.actions = actions
+return M

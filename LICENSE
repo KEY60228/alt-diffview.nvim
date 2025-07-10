@@ -1,6 +1,7 @@
-Diffview.nvim is a tool for Neovim that adds an interface that enables
-easy review of changes made in any Git revision.
-Copyright (C) 2021 Sindre T. Strøm
+AltDiffview.nvim is a fork of diffview.nvim, a tool for Neovim that adds an interface
+that enables easy review of changes made in any Git revision.
+Copyright (C) 2021 Sindre T. Strøm (original author)
+Copyright (C) 2024 Kenta Yamaguchi (fork maintainer)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
