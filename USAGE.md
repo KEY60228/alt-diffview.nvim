@@ -17,7 +17,7 @@ $ gh pr checkout {PR_ID}
 Now, run a symmetric diff against the base branch:
 
 ```vim
-:DiffviewOpen origin/HEAD...HEAD --imply-local
+:AltDiffviewOpen origin/HEAD...HEAD --imply-local
 ```
 
 The symmetric difference rev range (triple dot) will here compare the changes on
@@ -37,7 +37,7 @@ args:
 
 ```lua
 default_args = {
-  DiffviewOpen = { "--imply-local" },
+  AltDiffviewOpen = { "--imply-local" },
 }
 ```
 
@@ -62,10 +62,10 @@ involved.
 
 If you're reviewing a big PR composed of many commits, you might prefer to
 review the changes introduced in each of those commits individually. To do
-this, you can use `:DiffviewFileHistory`:
+this, you can use `:AltDiffviewFileHistory`:
 
 ```vim
-:DiffviewFileHistory --range=origin/HEAD...HEAD --right-only --no-merges
+:AltDiffviewFileHistory --range=origin/HEAD...HEAD --right-only --no-merges
 ```
 
 Here we are again using a symmetric difference range. However, symdiff ranges
@@ -89,7 +89,7 @@ achieved with the flag option `--walk-reflogs` (or it's short form `-g`). The
 following command will list all stashes in the file history panel:
 
 ```vim
-:DiffviewFileHistory -g --range=stash
+:AltDiffviewFileHistory -g --range=stash
 ```
 
 ## Committing
@@ -100,7 +100,7 @@ create a new commit from within the editor:
 
 ### Use a Git Wrapper Plugin (Recommended)
 
-Diffview.nvim _is not_, and _does not try to be_ a complete git wrapper. As
+AltDiffview.nvim _is not_, and _does not try to be_ a complete git wrapper. As
 such, there are a number of features offered by such plugins that won't ever be
 implemented here, because they are deemed out-of-scope. It's therefore
 recommended to use some form of a Git wrapper plugin in order to get a more
